@@ -1,1 +1,1 @@
-1, a, east
+1, c, north

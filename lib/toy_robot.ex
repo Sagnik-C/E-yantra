@@ -67,18 +67,59 @@ defmodule ToyRobot do
     #first determine the rotation needed for moving in the verical direction
     %ToyRobot.Position{x: x, y: y, facing: facing} = robot
     y= @robot_map_y_atom_to_num[y]
-    y_diff = goal_y - y
+    goal_y_num = @robot_map_y_atom_to_num[goal_y]
+    y_diff = goal_y_num - y
     robot =
-      if facing == :east  do
-        if y_diff > 0 do
-          left(robot)
-        else
-          right(robot)
-        end
+      cond do
+        facing == :east ->
+          if y_diff>=0 do
+            if y_diff != 0 do
+              left(robot)
+            else
+              robot
+            end
+          else
+            right(robot)
+          end
+        facing == :west ->
+          if y_diff>=0 do
+            if y_diff != 0 do
+              right(robot)
+            else
+              robot
+            end
+          else
+            left(robot)
+          end
+        facing == :north ->
+          if y_diff>=0 do
+            robot
+          else
+            right(robot)
+            right(robot)
+          end
+        facing == :south ->
+          if y_diff<=0 do
+            robot
+          else
+            right(robot)
+            right(robot)
+          end
       end
+    robot = moving(robot, y_diff)
     send_robot_status(robot, cli_proc_name)
     {:ok, robot}
   end
+  def moving(robot, y_diff) when y_diff==0 do
+    IO.puts(robot.y)
+    robot
+  end
+  def moving(robot, y_diff) do
+    robot = move(robot)
+    IO.puts(robot.y)
+    moving(robot, y_diff-1)
+  end
+  # @spec moving(any, atom | %{:y => any, optional(any) => any}) :: nil
 
   @doc """
   Send Toy Robot's current status i.e. location (x, y) and facing
