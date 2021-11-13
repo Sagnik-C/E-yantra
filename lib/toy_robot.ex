@@ -52,6 +52,7 @@ defmodule ToyRobot do
   """
   def start(x, y, facing) do
     place x, y, facing
+
   end
 
   def stop(_robot, goal_x, goal_y, _cli_proc_name) when goal_x < 1 or goal_y < :a or goal_x > @table_top_x or goal_y > @table_top_y do
@@ -64,58 +65,19 @@ defmodule ToyRobot do
   """
   def stop(robot, goal_x, goal_y, cli_proc_name) do
     #first determine the rotation needed for moving in the verical direction
-    position= %ToyRobot.Position{}
-    x_current= position.x
-    y_current= position.y
-    goal_y_=0
-    y_current_=0
-    case y_current do
-      :a -> y_current_=1
-      :b -> y_current_=2
-      :c -> y_current_=3
-      :d -> y_current_=4
-      :e -> y_current_=5
-    end
-    case goal_y do
-      :a -> goal_y_=1
-      :b -> goal_y_=2
-      :c -> goal_y_=3
-      :d -> goal_y_=4
-      :e -> goal_y_=5
-    end
-    facing_current= position.facing
-    x_diff= x_current-goal_x
-    y_diff= y_current_-goal_y_
-    IO.puts(facing_current)
-    cond do
-      facing_current== :east->
-        cond do
-          y_diff<0 -> left(ToyRobot.Position)
-          y_diff>0 -> right(ToyRobot.Position)
-          # true -> IO.puts("Error in rotation!")
+    %ToyRobot.Position{x: x, y: y, facing: facing} = robot
+    y= @robot_map_y_atom_to_num[y]
+    y_diff = goal_y - y
+    robot =
+      if facing == :east  do
+        if y_diff > 0 do
+          left(robot)
+        else
+          right(robot)
         end
-        facing_current== :west->
-          cond do
-            y_diff<0 -> right(ToyRobot.Position)
-            y_diff>0 -> left(ToyRobot.Position)
-            # true -> IO.puts("Error in rotation!")
-          end
-        facing_current== :north->
-          cond do
-            y_diff>0 -> right(ToyRobot.Position)
-                        right(ToyRobot.Position)
-            y_diff<=0 -> IO.puts("no rotation for 1st movement")
-            # true-> IO.puts("Error in rotation!")
-          end
-        facing_current== :south->
-          cond do
-            y_diff<0 -> left(ToyRobot.Position)
-                        left(ToyRobot.Position)
-            y_diff>=0 -> IO.puts("no rotation for 1st movement")
-            # true-> IO.puts("Error in rotation!")
-          end
-        true-> IO.puts("Error outer!")
-    end
+      end
+    send_robot_status(robot, cli_proc_name)
+    {:ok, robot}
   end
 
   @doc """
