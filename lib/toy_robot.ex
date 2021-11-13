@@ -69,6 +69,7 @@ defmodule ToyRobot do
     y= @robot_map_y_atom_to_num[y]
     goal_y_num = @robot_map_y_atom_to_num[goal_y]
     y_diff = goal_y_num - y
+    x_diff = goal_x - x
     robot =
       cond do
         facing == :east ->
@@ -107,6 +108,30 @@ defmodule ToyRobot do
           end
       end
     robot = moving(robot, y_diff)
+    robot =
+      cond do
+        robot.facing == :north ->
+          if x_diff>=0 do
+            if x_diff>0 do
+              right(robot)
+            else
+              robot
+            end
+          else
+            left(robot)
+          end
+        robot.facing == :south ->
+          if x_diff>=0 do
+            if x_diff>0 do
+              left(robot)
+            else
+              robot
+            end
+          else
+            right(robot)
+          end
+      end
+    robot = moving(robot, x_diff)
     send_robot_status(robot, cli_proc_name)
     {:ok, robot}
   end
