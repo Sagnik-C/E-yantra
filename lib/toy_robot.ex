@@ -108,7 +108,7 @@ defmodule ToyRobot do
           end
       end
     send_robot_status(robot, cli_proc_name)
-    robot = moving(robot, y_diff, cli_proc_name)
+    robot = moving(robot, abs(y_diff), cli_proc_name)
     robot =
       cond do
         robot.facing == :north ->
@@ -133,8 +133,10 @@ defmodule ToyRobot do
           end
       end
     send_robot_status(robot, cli_proc_name)
-    robot = moving(robot, x_diff, cli_proc_name)
-    send_robot_status(robot, cli_proc_name)
+    robot = moving(robot, abs(x_diff), cli_proc_name)
+    if robot.x != goal_x and robot.y != goal_y do
+      send_robot_status(robot, cli_proc_name)
+    end
     {:ok, robot}
   end
   def moving(robot, y_diff, cli_proc_name) when y_diff==0 do
