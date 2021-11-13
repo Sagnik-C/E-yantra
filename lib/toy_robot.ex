@@ -64,6 +64,9 @@ defmodule ToyRobot do
   Passing the CLI Server process name that will be used to send robot's current status after each action is taken.
   """
   def stop(robot, goal_x, goal_y, cli_proc_name) do
+    if goal_x != robot.x and goal_y != robot.y do
+      send_robot_status(robot, cli_proc_name)
+    end
     #first determine the rotation needed for moving in the verical direction
     %ToyRobot.Position{x: x, y: y, facing: facing} = robot
     y= @robot_map_y_atom_to_num[y]
@@ -106,11 +109,15 @@ defmodule ToyRobot do
             right(robot)
           end
       end
+    if facing != robot.facing do
+      send_robot_status(robot, cli_proc_name)
+    end
 
-    send_robot_status(robot, cli_proc_name)
     robot =
       if (facing == :south and y_diff>0) or (facing == :north and y_diff < 0) do
         right(robot)
+      else
+        robot
       end
     if (facing == :south and y_diff>0) or (facing == :north and y_diff<0) do
       send_robot_status(robot, cli_proc_name)
