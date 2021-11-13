@@ -97,17 +97,24 @@ defmodule ToyRobot do
             robot
           else
             right(robot)
-            right(robot)
+
           end
         facing == :south ->
           if y_diff<=0 do
             robot
           else
             right(robot)
-            right(robot)
           end
       end
+
     send_robot_status(robot, cli_proc_name)
+    robot =
+      if (facing == :south and y_diff>0) or (facing == :north and y_diff < 0) do
+        right(robot)
+      end
+    if (facing == :south and y_diff>0) or (facing == :north and y_diff<0) do
+      send_robot_status(robot, cli_proc_name)
+    end
     robot = moving(robot, abs(y_diff), cli_proc_name)
     robot =
       cond do
@@ -132,9 +139,11 @@ defmodule ToyRobot do
             right(robot)
           end
       end
-    send_robot_status(robot, cli_proc_name)
+    if robot.x != goal_x or robot.y != goal_y do
+      send_robot_status(robot, cli_proc_name)
+    end
     robot = moving(robot, abs(x_diff), cli_proc_name)
-    if robot.x != goal_x and robot.y != goal_y do
+    if robot.x != goal_x or robot.y != goal_y do
       send_robot_status(robot, cli_proc_name)
     end
     {:ok, robot}
