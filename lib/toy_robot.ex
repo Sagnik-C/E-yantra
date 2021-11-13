@@ -107,7 +107,8 @@ defmodule ToyRobot do
             right(robot)
           end
       end
-    robot = moving(robot, y_diff)
+    send_robot_status(robot, cli_proc_name)
+    robot = moving(robot, y_diff, cli_proc_name)
     robot =
       cond do
         robot.facing == :north ->
@@ -131,18 +132,18 @@ defmodule ToyRobot do
             right(robot)
           end
       end
-    robot = moving(robot, x_diff)
+    send_robot_status(robot, cli_proc_name)
+    robot = moving(robot, x_diff, cli_proc_name)
     send_robot_status(robot, cli_proc_name)
     {:ok, robot}
   end
-  def moving(robot, y_diff) when y_diff==0 do
-    IO.puts(robot.y)
+  def moving(robot, y_diff, cli_proc_name) when y_diff==0 do
     robot
   end
-  def moving(robot, y_diff) do
+  def moving(robot, y_diff, cli_proc_name) do
     robot = move(robot)
-    IO.puts(robot.y)
-    moving(robot, y_diff-1)
+    send_robot_status(robot, cli_proc_name)
+    moving(robot, y_diff-1, cli_proc_name)
   end
   # @spec moving(any, atom | %{:y => any, optional(any) => any}) :: nil
 
